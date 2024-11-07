@@ -84,9 +84,41 @@ def decompress(blob):
     return bytes(out)
 
 
+def entropy(data):
+    n = len(data)
+    return -sum(c / n * math.log2(c / n) for c in Counter(data).values()) if n else 0.0
 
 
+def report(data, blob):
+    n = len(data)
+    print(f"original:   {n} bytes")
+    print(f"compressed: {len(blob)} bytes ({HEADER.size} header + {len(blob) - HEADER.size} payload)")
+    if n == 0:
+        return
+    lengths = code_lengths(data)
+    avg = sum(lengths[b] for b in data) / n
+    h = entropy(data)
+    print(f"ratio:      {n / len(blob):.3f}x  ({len(blob) / n:.1%} of original)")
+    print(f"entropy:    {h:.4f} bits/byte -> bound {math.ceil(h * n / 8)} bytes")
+    print(f"huffman:    {avg:.4f} bits/byte ({avg - h:.4f} above entropy)")
 
 
+def main():
+    p = argparse.ArgumentParser(description="Canonical Huffman file compressor")
+    p.add_argument("mode", choices=["compress", "decompress"])
+    p.add_argument("src")
+    p.add_argument("dst")
+    args = p.parse_args()
+    with open(args.src, "rb") as f:
+        data = f.read()
+    if args.mode == "compress":
+        blob = compress(data)
+        report(data, blob)
+    else:
+        blob = decompress(data)
+    with open(args.dst, "wb") as f:
+        f.write(blob)
 
 
+if __name__ == "__main__":
+    main()
