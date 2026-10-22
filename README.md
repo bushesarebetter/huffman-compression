@@ -1,6 +1,8 @@
-# huffman-compression
+# Huffman compression
 
 A small file compressor using canonical Huffman codes. The header holds only the original length and one code length per byte value, so the decoder can rebuild the exact code table without storing the tree. Pure standard library.
+
+[Setup](#setup) · [Run](#run) · [Compression results](#compression-results) · [Tests](#tests)
 
 ## Setup
 
@@ -8,14 +10,16 @@ Python 3.10+, no dependencies.
 
 ## Run
 
-```
+```bash
 python huffman.py compress input.txt input.huf
 python huffman.py decompress input.huf restored.txt
 ```
 
+## Compression results
+
 Compressing prints the ratio and how close the codes get to the Shannon entropy. Running it on its own source:
 
-```
+```text
 original:   3738 bytes
 compressed: 2493 bytes (268 header + 2225 payload)
 ratio:      1.499x  (66.7% of original)
@@ -25,9 +29,9 @@ huffman:    4.7619 bits/byte (0.0219 above entropy)
 
 Random bytes don't compress (8.0 bits/byte, already at entropy), so the output ends up 268 bytes larger.
 
-## Test
+## Tests
 
-```
+```bash
 pip install pytest
 python -m pytest -q
 ```
